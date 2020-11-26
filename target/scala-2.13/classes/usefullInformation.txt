@@ -1,0 +1,7 @@
+http://tutorials.jenkov.com/java-io/overview.html => Java IO
+
+
+  //A stream is a conceptually endless flow of data
+  //A stream is connected to a data source or a data destination
+  //Streams in Java IO can be either byte based (reading and writing bytes)
+  // or character based (reading and writing characters)
