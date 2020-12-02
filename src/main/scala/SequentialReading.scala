@@ -1,38 +1,27 @@
-import java.io.{BufferedReader, File, FileReader}
+import java.io.{BufferedReader, File, FileReader, RandomAccessFile}
 
 import Streams.InputStream
 
 object SequentialReading {
 
-  def Length(f : String) : Unit = {
-    var count = 0
+  def Length(file : File) : Unit = {
 
-    var inputStream = new InputStream(f)
+    var counter = 0
+    var inputStream = new InputStream(file)
     inputStream.open
 
-    while(!inputStream.endOfStream(inputStream.bufferedReader)) {
-      count += 1
+    while (true) {
+      var line = inputStream.readLine
+      counter += line.length()
     }
-    println(count)
-  }
 
+    inputStream.close
+  }
 
   def main(args: Array[String]): Unit = {
 
-    Length("src/main/resources/sample.txt")
-
-    var inputStream = new InputStream("src/main/resources/sample.txt")
-    inputStream.open
-
-    // Go forward pointer for 40 position
-
-    println(inputStream.seek(2))
-    inputStream.readLineByBuffer
-    println(inputStream.seek(2))
-
-    inputStream.close
-
+    var file = new File("src/main/resources/sample.txt")
+    Length(file)
   }
-
-
 }
+

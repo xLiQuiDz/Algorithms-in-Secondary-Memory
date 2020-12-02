@@ -3,19 +3,26 @@ import scala.util.Random
 import java.io.{BufferedReader, File, FileReader}
 
 object RandomReading {
-  def randjump(f: String, j: Int) : Int = {
+  def randjump(f: File, j: Int) : Unit = {
 
+    var count = 0
     var inputStream = new InputStream(f)
     inputStream.open
-    var count = 0
-    var p = Random.between(0, 30)
-    inputStream.seek(p)
 
-
-   5
+    for (i <- 0 until j) {
+      var p = Random.between(0, 10)
+      inputStream.seek(p)
+    }
+    
   }
 
   def main(args: Array[String]): Unit = {
+
+    var file = new File("src/main/resources/sample.txt")
+    print(file.length())
+
+
+
 
 
   }
