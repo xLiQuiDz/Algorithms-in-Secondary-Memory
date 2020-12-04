@@ -4,24 +4,27 @@ import Streams.InputStream
 
 object SequentialReading {
 
-  def Length(file : File) : Unit = {
+  // High order function that takes readln as function.
+  def Length(file : File) : Long = {
 
-    var counter = 0
     var inputStream = new InputStream(file)
-    inputStream.open
+    inputStream.open()
+    var count = 0
 
-    while (true) {
-      var line = inputStream.readLine
-      counter += line.length()
+    while (!inputStream.endOfStream) {
+      var line = inputStream.readLine()
+      // println(counter + ": " + line + " length: " + line.length())
+      count += line.length()
     }
-
     inputStream.close
+    count
   }
 
   def main(args: Array[String]): Unit = {
 
     var file = new File("src/main/resources/sample.txt")
-    Length(file)
+    println(Length(file))
+
   }
 }
 

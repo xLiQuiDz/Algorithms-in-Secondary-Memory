@@ -4,33 +4,32 @@ import java.io.{BufferedReader, File, FileInputStream, FileReader, IOException, 
 
 class InputStream(file: File){
 
-  var fileReader: FileReader = null //main stream
-  var bufferedReader: BufferedReader = null //used in second readLine
+  private var fileReader: FileReader = null // Main stream.
+  private var bufferedReader: BufferedReader = null // Used for reading line.
+  private var randomAccessFile: RandomAccessFile = null // Used for seeking a position in file.
 
-  private var randomAccessFile: RandomAccessFile = null //used for seek function
-  private var stringBuffer: StringBuffer = null //to show output
+  private var stringBuffer: StringBuffer = null // Shows string output.
 
-  private var nextChar : Char = " ".charAt(0)
-  private var nextInt = 0
+  var endOfStream = false
 
-  override def toString: String = stringBuffer.toString()
-
-  // Open file
-  def open: Unit = {
+  // Open file for reading.
+  def open(): Unit = {
     try{
       fileReader = new FileReader(file)
       bufferedReader =  new BufferedReader(fileReader)
+      randomAccessFile = new RandomAccessFile(file, "r")
       stringBuffer = new StringBuffer
     } catch {
       case _ => throw new Exception("File does not exist ...")
     }
   }
 
-  // close file
-  def close: Unit = {
+  // close file.
+  def close(): Unit = {
     try {
-      fileReader.close
-      bufferedReader.close
+      fileReader.close()
+      bufferedReader.close()
+      randomAccessFile.close()
       stringBuffer = new StringBuffer
     } catch {
       case _ => throw new Exception("File does not exist ...")
@@ -39,14 +38,15 @@ class InputStream(file: File){
 
   // Implementation 1.1.1
   // Read one character and add to string buffer.
-  def readCharacter: StringBuffer = {
+  def readCharacter(): StringBuffer = {
     resetStringBuffer()
     try {
-      var data = 0
-      while(data != -1) {
+      var data = fileReader.read()
+      while(data != 10 && data != -1) { // End of line or end of file.
+        stringBuffer.append(data.asInstanceOf[Char])
         data = fileReader.read()
-        stringBuffer.append(data.asInstanceOf[Char]) // Convert ASCI to char.
       }
+      if (data == -1) endOfStream = true
       stringBuffer
     } catch {
       case _ => throw new Exception("Stream has not been opened ...")
@@ -55,14 +55,14 @@ class InputStream(file: File){
 
   // Implementation 1.1.2
   // Read one line and add to string buffer.
-  def readLine: StringBuffer = {
+  def readLine(): StringBuffer = {
     resetStringBuffer()
     try {
       var data = bufferedReader.readLine()
-      if (data != null) {
+      if (data != 10 && data != null) { // End of line or end of file.
         stringBuffer.append(data)
       } else {
-
+        endOfStream = true
       }
       stringBuffer
     } catch {
@@ -70,48 +70,38 @@ class InputStream(file: File){
     }
   }
 
-  // Seek possition in line
-  def seek(pos: Int): StringBuffer = {
+  // Implementation 1.1.3
+  // Read one character and add to buffer.
+  def readCharacterWithBuffer(bufferSize : Int) : StringBuffer = {
+    resetStringBuffer()
     try {
-      randomAccessFile = new RandomAccessFile(file.getPath(), "r")
+      var i = 0
+      var data = fileReader.read()
+
+      while(data != -1 && i < bufferSize ) { // End of line or end of file.
+        stringBuffer.append(data.asInstanceOf[Char])
+        data = fileReader.read()
+        i += 1
+      }
+      if (data == -1) endOfStream = true
+      stringBuffer
+    } catch {
+      case _ => throw new Exception("Stream has not been opened ...")
+    }
+  }
+
+  // Seek position in line.
+  def seek(pos: Long): Unit = {
+    try {
       randomAccessFile.seek(pos)
       fileReader = new FileReader(randomAccessFile.getFD)
       bufferedReader =  new BufferedReader(fileReader)
-
-      val line = bufferedReader.readLine
-      stringBuffer.append(line)
-      randomAccessFile.close()
-      stringBuffer
     } catch {
       case _ => throw new Exception("File does not exist ...")
     }
   }
 
-
-
-  def test: StringBuffer = {
-
-    if(fileReader == null){
-      throw new Exception("Stream has not been opened ...")
-    }
-
-    while(nextInt != 10) {
-      nextChar = nextInt.toChar
-      stringBuffer.append(nextChar.asInstanceOf[Char])
-      nextInt = fileReader.read()
-    }
-    stringBuffer
-  }
-
-  // Returns true if, end of file
-  def endOfStream(file : Any): Boolean = file match {
-    case f: FileReader => {nextInt = fileReader.read
-      nextInt == -1 } // end of stream
-    case b: BufferedReader => {var nextLine = bufferedReader.readLine
-      nextLine == null } // end of stream
-  }
-
-  def resetStringBuffer() = {
+  def resetStringBuffer(): Unit = {
     stringBuffer = new StringBuffer()
   }
 }

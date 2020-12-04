@@ -3,27 +3,27 @@ import scala.util.Random
 import java.io.{BufferedReader, File, FileReader}
 
 object RandomReading {
-  def randjump(f: File, j: Int) : Unit = {
 
-    var count = 0
-    var inputStream = new InputStream(f)
+  // High order function that takes readln as function
+  def randjump(file: File, j: Int) : Long = {
+
+    var inputStream = new InputStream(file)
     inputStream.open
+    var count = 0
 
     for (i <- 0 until j) {
-      var p = Random.between(0, 10)
+      var p = Random.between(0, file.length())
       inputStream.seek(p)
+
+      var line = inputStream.readLine()
+      count += line.length()
     }
-    
+    count
   }
 
   def main(args: Array[String]): Unit = {
-
+    
     var file = new File("src/main/resources/sample.txt")
-    print(file.length())
-
-
-
-
-
+    println(randjump(file, 5))
   }
 }

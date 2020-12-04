@@ -4,54 +4,54 @@ import java.io.{BufferedWriter, FileWriter}
 
 class OutputStream(fileAddress: String) {
 
-  var fileWriter: FileWriter = null //main writer stream
+  private var fileWriter: FileWriter = null // Main writer stream.
+  private var bufferedWriter: BufferedWriter = null // Used in second readLine.
 
-  var bufferedWriter: BufferedWriter = null //used in second readLine
-  var stringBuffer: StringBuffer = null //to show output
+  var stringBuffer: StringBuffer = null // To show output.
 
-
-  def create = {
+  // Open file for writing.
+  def create(): Unit = {
     fileWriter = new FileWriter(fileAddress)
+    bufferedWriter = new BufferedWriter(fileWriter)
   }
 
-  def writeLine(str: String) = {
-
-    if(fileWriter == null) {
-      throw new Exception("Stream has not been created ...")
+  // Implementation 1.1.1
+  // Write one character to file.
+  def writeCharacter(line: StringBuffer): Unit = {
+    try {
+      var i = 0
+      while (i < line.length()) {
+        fileWriter.write(line.charAt(i))
+        i += 1
+      }
+      fileWriter.write(System.lineSeparator)
+      } catch {
+      case _ => throw new Exception("Stream has not been created ...")
     }
-
-    fileWriter.write(str)
-    fileWriter.write(System.lineSeparator)
   }
 
-  def writeLineByBuffer(str: String) = {
-
-    if(fileWriter == null) {
-      throw new Exception("Stream has not been created ...")
+  // Implementation 1.1.2
+  // Write one line to file.
+  def writeLine(line: String): Unit = {
+    try{
+      bufferedWriter = new BufferedWriter(fileWriter);
+      bufferedWriter.write(line)
+      bufferedWriter.write(System.lineSeparator)
+      bufferedWriter.flush()
+    } catch {
+      case _ => throw new Exception("Stream has not been created ...")
     }
-
-    bufferedWriter = new BufferedWriter(fileWriter);
-    bufferedWriter.write(str)
-    bufferedWriter.write(System.lineSeparator)
-    bufferedWriter.flush
   }
 
-  def close = {
+  def writeLineWithBuffer = ???
 
-    if(fileWriter == null) {
-      throw new Exception("Stream has not been created ...")
+
+  def close: Unit = {
+    try {
+      fileWriter.close()
+      bufferedWriter.close
+    } catch {
+      case _ => throw new Exception("Stream has not been created ...")
     }
-    fileWriter.close()
   }
-
-  def bufferClose = {
-
-    if(bufferedWriter == null) {
-      throw new Exception("Buffer stream has not been created ...")
-    }
-    bufferedWriter.close
-  }
-
-  def writeLineByBuffer(str: String, bufferSize: Int) = ???
-
 }
