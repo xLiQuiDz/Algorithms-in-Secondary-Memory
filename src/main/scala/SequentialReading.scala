@@ -1,4 +1,4 @@
-import java.io.{BufferedReader, File, FileReader, RandomAccessFile}
+import java.io.File
 
 import Streams.InputStream
 
@@ -22,7 +22,7 @@ object SequentialReading {
 
   def main(args: Array[String]): Unit = {
 
-    var file = new File("src/main/resources/sample.txt")
+    var file = new File("src/main/resources/sampleFiles/sample.csv")
     println(Length(file))
 
   }

@@ -1,6 +1,8 @@
+import java.io.File
+
 import Streams.InputStream
+
 import scala.util.Random
-import java.io.{BufferedReader, File, FileReader}
 
 object RandomReading {
 
@@ -23,7 +25,7 @@ object RandomReading {
 
   def main(args: Array[String]): Unit = {
     
-    var file = new File("src/main/resources/sample.txt")
+    var file = new File("src/main/resources/sampleFiles/sample.csv")
     println(randjump(file, 5))
   }
 }

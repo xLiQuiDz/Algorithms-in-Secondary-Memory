@@ -1,6 +1,6 @@
 package Streams
 
-import java.io.{BufferedReader, File, FileInputStream, FileReader, IOException, RandomAccessFile}
+import java.io.{BufferedReader, File, FileReader, RandomAccessFile}
 
 class InputStream(file: File){
 

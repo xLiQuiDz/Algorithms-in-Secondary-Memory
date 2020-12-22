@@ -19,6 +19,12 @@
       </option>
     </JetCodeStyleSettings>
     <ScalaCodeStyleSettings>
+      <option name="alwaysUsedImports">
+        <array>
+          <option value="akka.actor.ActorSystem" />
+          <option value="akka.akka" />
+        </array>
+      </option>
       <option name="MULTILINE_STRING_CLOSING_QUOTES_ON_NEW_LINE" value="true" />
     </ScalaCodeStyleSettings>
   </code_scheme>
