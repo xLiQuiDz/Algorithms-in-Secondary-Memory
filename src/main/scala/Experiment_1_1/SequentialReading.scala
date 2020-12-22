@@ -23,7 +23,7 @@ case class SequentialReading(fileAddress: String){
     inputStream.open
     var count = 0
     while (!inputStream.endOfStream) {
-      var line = inputStream.readLine //72031550
+      var line = inputStream.readLine // 72031550
       count += line.length
     }
     inputStream.close
@@ -35,7 +35,7 @@ case class SequentialReading(fileAddress: String){
     var count = 0
     while (!inputStream.endOfStream) {
       inputStream.setBufferSize(bufferSize)
-      var line = inputStream.readCharacterWithBuffer //72031550
+      var line = inputStream.readCharacterWithBuffer // 72031550
       count += line.length
     }
     inputStream.close
@@ -46,7 +46,7 @@ case class SequentialReading(fileAddress: String){
     inputStream.open
     var count = 0
     while (!inputStream.endOfStream) {
-      var line = inputStream.readFromMappedMemory(bufferSize) // problem
+      var line = inputStream.readFromMappedMemory(bufferSize)
       count += line.length
     }
     inputStream.close

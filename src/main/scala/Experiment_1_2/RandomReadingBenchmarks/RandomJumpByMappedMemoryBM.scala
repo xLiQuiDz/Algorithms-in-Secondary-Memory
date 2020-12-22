@@ -8,7 +8,7 @@ case class RandJumpByMappedMemoryBM(fileAddress: String, j:Int,  bufferSize: Int
 
   def benchmark: Unit = {
 
-    //Run benchmark
+    // Run benchmark.
     while (repeatIndex < REPEATS) {
 
       startTime = System.nanoTime

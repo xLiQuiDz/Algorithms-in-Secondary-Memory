@@ -1,11 +1,12 @@
 package Streams
 
 import java.io.{BufferedWriter, File, FileOutputStream, FileWriter, RandomAccessFile}
-import java.nio.{ByteBuffer, CharBuffer}
+import java.nio.{CharBuffer}
 import java.nio.channels.FileChannel
 import java.nio.charset.Charset
 
-//1.2 Writing
+
+// 1.2 Writing.
 class OutputStream(file: File) {
 
   private var fileWriter: FileWriter = null // Main writer stream.
@@ -65,7 +66,7 @@ class OutputStream(file: File) {
   def writeLine(line: String): Unit = {
     try {
       bufferedWriter.write(line)
-      bufferedWriter.write(System.lineSeparator)
+      fileWriter.write(System.lineSeparator)
       bufferedWriter.flush()
     } catch {
       case _ => throw new Exception("Stream has not been created ...")
@@ -83,7 +84,7 @@ class OutputStream(file: File) {
   }
 
   // Implementation 1.1.3
-  //write B character of line into the stream
+  // Write B character of line into the stream.
   def writeCharacterIntoBuffer(line: String): Unit = {
     try {
       var i = 0
@@ -91,8 +92,8 @@ class OutputStream(file: File) {
         bufferedWriter.write(line.charAt(i))
         i += 1
       }
-      bufferedWriter.write(System.lineSeparator)
       bufferedWriter.flush()
+      fileWriter.write(System.lineSeparator)
     } catch {
       case _ => throw new Exception("Stream has not been opened ...")
     }

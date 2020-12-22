@@ -3,7 +3,7 @@ package Streams
 import java.io.{BufferedReader, File, FileInputStream, FileReader, RandomAccessFile}
 import java.nio.channels.FileChannel
 
-// 1.1 Reading
+//1.1 Reading
 class InputStream(file: File) {
 
   private var fileReader: FileReader = null // Main reader stream.
@@ -14,31 +14,31 @@ class InputStream(file: File) {
 
   private var stringBuffer: StringBuffer = null // Shows string output.
 
-  var endOfStream = false //for detecting end of stream
+  var endOfStream = false // for detecting end of stream.
 
   private var currentPosition: Int = 0
   private var channelSize: Long = 0
 
-  // Initializing the fields for stream
+  // Initializing the fields for stream.
   def open: Unit = {
     try {
-      // used in 1.1.1
+      // Used in 1.1.1
       fileReader = new FileReader(file)
 
-      //used in 1.1.2 and 1.1.3
+      // Used in 1.1.2 and 1.1.3
       bufferedReader = new BufferedReader(fileReader)
 
-      //used in seek and 1.1.4
+      // Used in seek and 1.1.4
       randomAccessFile = new RandomAccessFile(file, "r")
 
-      //used in 1.1.4
+      // Used in 1.1.4
       fileInputStream = new FileInputStream(file)
       fileChannel = randomAccessFile.getChannel
       channelSize = fileChannel.size
       currentPosition = 0
       endOfStream = false
 
-      //used for output the read line
+      // Used for output the read line
       stringBuffer = new StringBuffer
 
     } catch {
@@ -46,7 +46,7 @@ class InputStream(file: File) {
     }
   }
 
-  // close file.
+  // Close file.
   def close: Unit = {
     try {
       fileReader.close
@@ -66,14 +66,14 @@ class InputStream(file: File) {
   }
 
   // Implementation 1.1.1
-  // Read one character and add to StringBuffer using FileReader
+  // Read one character and add to StringBuffer using FileReader.
   def readCharacter: StringBuffer = {
     resetStringBuffer
     try {
-      var data = fileReader.read //it reads the int of next character
+      var data = fileReader.read() // Reads the int of next character.
       while (data != 10 && data != -1) { // 10 for detecting End of line or -1 for detecting end of file.
         stringBuffer.append(data.asInstanceOf[Char])
-        data = fileReader.read
+        data = fileReader.read()
       }
       if (data == -1) endOfStream = true
       stringBuffer
@@ -83,13 +83,14 @@ class InputStream(file: File) {
   }
 
   // Implementation 1.1.2
-  // Read one line and add to StringBuffer using BufferedReader
+  // Read one line and add to StringBuffer using BufferedReader.
   def readLine: StringBuffer = {
     resetStringBuffer
     try {
       val data = bufferedReader.readLine()
       if (data != 10 && data != null) { // End of line or end of file.
         stringBuffer.append(data)
+        stringBuffer.append(System.lineSeparator())
       } else {
         endOfStream = true
       }
@@ -100,14 +101,14 @@ class InputStream(file: File) {
   }
 
   // Implementation 1.1.3
-  // Read one line and add to StringBuffer using BufferedReader, the BufferedReader is limited by setBufferSize
+  // Read one line and add to StringBuffer using BufferedReader, the BufferedReader is limited by setBufferSize.
   def readCharacterWithBuffer: StringBuffer = {
     resetStringBuffer
     try {
       var data = bufferedReader.read()
       while (data != 10 && data != -1) { // 10 for detecting End of line or -1 for detecting end of file.
         stringBuffer.append(data.asInstanceOf[Char])
-        data = bufferedReader.read
+        data = bufferedReader.read()
       }
       if (data == -1) endOfStream = true
       stringBuffer
@@ -119,11 +120,12 @@ class InputStream(file: File) {
 
   // Implementation 1.1.4
   // Read one character and add to buffer.
-  //explanation of memorry mapping:
-  //https://www.mathworks.com/help/matlab/import_export/overview-of-memory-mapping.html#:~:text=Memory%2Dmapping%20is%20a%20mechanism,within%20an%20application's%20address%20space.&text=This%20makes%20file%20reads%20and,such%20as%20fread%20and%20fwrite%20.
-  //https://www.ibm.com/support/knowledgecenter/ssw_aix_72/generalprogramming/understanding_mem_mapping.html
-  //https://howtodoinjava.com/java/nio/memory-mapped-files-mappedbytebuffer/
-  //https://www.javacodegeeks.com/2013/05/power-of-java-memorymapped-file.html
+  // Explanation of memorry mapping:
+  // https://www.mathworks.com/help/matlab/import_export/overview-of-memory-mapping.html#:~:text=Memory%2Dmapping%20is%20a%20mechanism,within%20an%20application's%20address%20space.&text=This%20makes%20file%20reads%20and,such%20as%20fread%20and%20fwrite%20.
+  // https://www.ibm.com/support/knowledgecenter/ssw_aix_72/generalprogramming/understanding_mem_mapping.html
+  // https://howtodoinjava.com/java/nio/memory-mapped-files-mappedbytebuffer/
+  // https://www.javacodegeeks.com/2013/05/power-of-java-memorymapped-file.html
+  // this function does not work correctly!!!!!!
   def readFromMappedMemory(bufferSize: Int): StringBuffer = {
     resetStringBuffer
 
@@ -144,12 +146,11 @@ class InputStream(file: File) {
     var data = mappedByteBuffer.get()
 
     var i: Int = 0
-    // ByteBuffer has enough data in it in order to read a double (8 bytes)
-    while (data != -1 && data != 10 && i < size && mappedByteBuffer.remaining() >= 36) { //36 = 4 * 8(double) + 1 * 4(int)
+    while (data != -1 && data != 10 && i < size && mappedByteBuffer.remaining() >= 36) {
       byteArray(i) = data
       data = mappedByteBuffer.get()
       currentPosition += 1
-      i +=1
+      i += 1
     }
     val text = (byteArray.map(_.toChar)).mkString
     stringBuffer.append(text)
@@ -169,7 +170,7 @@ class InputStream(file: File) {
     }
   }
 
-  //Set buffer size for BufferedReader
+  // Set buffer size for BufferedReader
   def setBufferSize(bufferSize: Int): Unit = {
     try {
       bufferedReader = new BufferedReader(fileReader, bufferSize)

@@ -61,5 +61,4 @@ case class RandomReading(fileAddress: String) {
     inputStream.close
     count
   }
-
 }

@@ -3,7 +3,7 @@ package Experiment_1_1
 import Experiment_1_1.SequentialReadingBenchmarks.{LengthByMappedMemoryBM, LengthByReadBufferBM, LengthByReadBufferSizeBM, LengthByReadCharacterBM}
 
 object Benchmarks extends App {
-  val fileAddress = "src/main/resources/sample.txt"
+  val fileAddress = "src/main/resources/sample1.csv"
 
   System.out.println("----------------------Benchmarking LengthByReadCharacterBM---------------------------")
   val bm1 = LengthByReadCharacterBM(fileAddress)
