@@ -2,7 +2,7 @@ import java.io.File
 
 import Streams.{InputStream, OutputStream}
 
-object CombinedReadingAndWriting extends App {
+object CombinedReadLineAndWriteChar extends App {
 
   val folderPath: String="src/main/resources/sampleFiles/"
   val file1 = new File(folderPath)
@@ -18,7 +18,7 @@ object CombinedReadingAndWriting extends App {
 
          var inputArray: Array[InputStream] = new Array[InputStream](f)
 
-         val outputStream = new OutputStream("src/main/resources/readWriteFile.csv")
+         val outputStream = new OutputStream("src/main/resources/readLineWriteCharFile.csv")
          outputStream.create()
 
         for(i<- 0 to f-1) {
@@ -34,7 +34,6 @@ object CombinedReadingAndWriting extends App {
 //              strBuff = inputArray(i).readCharacter()
 //              strBuff = inputArray(i).readCharacterWithBuffer(5)
               if(!inputArray(i).endOfStream) {
-                //outputStream.writeLine(strBuff.toString) //works
                outputStream.writeCharacter(strBuff)
               }
               while_var = while_var & inputArray(i).endOfStream
