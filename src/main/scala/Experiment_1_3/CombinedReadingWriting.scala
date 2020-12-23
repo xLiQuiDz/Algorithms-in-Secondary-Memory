@@ -1,52 +1,86 @@
 package Experiment_1_3
 
+import Streams._
+
 import java.io.File
-import Streams.{InputStream, OutputStream}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
-class CombinedReadingWriting(folderAddress : String) {
+// https://stackoverflow.com/questions/25086479/read-multiple-text-files-simultaneously-in-scala
+class CombinedReadingAndWriting(outputFileAddress: String, inputFilesAddressArrays: Array[String]) {
 
-  val folder = new File(folderAddress)
-  var stringBuffer: StringBuffer = null
+  var stringBuffer: StringBuffer = new StringBuffer()
+  val outputStream = new OutputStream(new File(outputFileAddress))
+  var inputStreamsList = new Array[(InputStream, Boolean)](inputFilesAddressArrays.length)
 
-  rrMerge(2)
+  outputStream.create
 
-  def rrMerge(f: Int): Unit = {
-    if(folder.exists() && folder.isDirectory){
-      val fileArray: Array[String] = folder.listFiles(_.isFile).
-        filter(_.getName.endsWith(".csv")).
-        map(i => folderAddress + i.getName)
+  // Maps array with file to array with input stream.
+  inputFilesAddressArrays.foreach(fileAddress => {
+    val inputStream = new InputStream(new File(fileAddress))
+    inputStream.open
+    inputStreamsList :+ (inputStream, false)
+  })
 
-      val inputArray: Array[InputStream] = new Array[InputStream](f)
-
-      val outputStream = new OutputStream(new File("src/main/resources/readLineWriteLineFile.csv"))
-
-      outputStream.create
-
-      for(i <- 0 to f-1) {
-        val fName = new File(fileArray(i)) // Get File.
-        inputArray(i) = new InputStream(fName)
-        inputArray(i).open
-      }
-
-      // use futures
-      var while_var = true
-      while (while_var) {
-        for (i <- 0 to f - 1) {
-          stringBuffer = inputArray(i).readLine
-          if(!inputArray(i).endOfStream) {
-            outputStream.writeLine(stringBuffer.toString) //works
-          }
-          while_var = while_var & inputArray(i).endOfStream
+  def rrmergeByReadBufferSize : Unit = {
+    inputFilesAddressArrays.zipWithIndex.map {
+      case (fileAddress, index) => Future(readCharacterWithBufferWriteCharacter(fileAddress, index))
+        .onComplete { case Success(res) => {val allFilesRead = inputStreamsList.forall(tuple => tuple._2 == true)
+          if (allFilesRead) outputStream.close
         }
-        while_var = !while_var
-      }
-
-      // Close Inputfiles.
-      for(i<- 0 to f-1) {
-        inputArray(i).close
-      }
-
-      outputStream.close
+        case Failure(e) => println("failure: " + e.getMessage)
+        }
     }
   }
+
+
+
+
+
+
+
+
+  // Best result from 1.1
+  // Reading character with buffer --> writing character.
+  def readCharacterWithBufferWriteCharacter(fileAddress: String, index: Int): Unit = {
+    val inputStream = new InputStream(new File(fileAddress))
+    inputStreamsList(index) = (inputStream, false)
+    inputStream.open
+    while (!inputStream.endOfStream) {
+      stringBuffer = inputStream.readCharacterWithBuffer
+      outputStream.writeCharacter(stringBuffer.toString)
+    }
+    inputStream.close
+    inputStreamsList(index) = (inputStream, true)
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Best result from 1.2
+  // Reading from mapped memory
+  def readCharacterWithBufferWriteLine(fileAddress: String, index: Int): Unit = {
+    val inputStream = new InputStream(new File(fileAddress))
+    inputStreamsList(index) = (inputStream, false)
+    inputStream.open
+    while (!inputStream.endOfStream) {
+      stringBuffer = inputStream.readCharacterWithBuffer
+      outputStream.writeCharacter(stringBuffer.toString)
+    }
+    inputStream.close
+    inputStreamsList(index) = (inputStream, true)
+  }
 }
+

@@ -1,5 +1,10 @@
 package Experiment_1_3
 
-object Benchmarks {
+object Benchmarks extends App {
+
+
+
+
+
 
 }

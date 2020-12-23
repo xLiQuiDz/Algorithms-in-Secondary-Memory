@@ -2,8 +2,9 @@ package Experiment_1_2.RandomReadingBenchmarks
 
 import Benchmark.Benchmark
 import Experiment_1_2.RandomReading
+import java.io.File
 
-case class RandJumpByMappedMemoryBM(fileAddress: String, j:Int,  bufferSize: Int) extends Benchmark{
+case class RandJumpByMappedMemoryBM(file: File, j:Int,  bufferSize: Int) extends Benchmark{
   override var repeatIndex: Int = 0
 
   def benchmark: Unit = {
@@ -13,7 +14,7 @@ case class RandJumpByMappedMemoryBM(fileAddress: String, j:Int,  bufferSize: Int
 
       startTime = System.nanoTime
 
-      length = RandomReading(fileAddress).randJumpByMappedMemory(j, bufferSize)
+      length = RandomReading(file).randJumpByMappedMemory(j, bufferSize)
 
       endTime = System.nanoTime
 

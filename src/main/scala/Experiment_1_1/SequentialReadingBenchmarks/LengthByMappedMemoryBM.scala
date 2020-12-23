@@ -2,22 +2,23 @@ package Experiment_1_1.SequentialReadingBenchmarks
 
 import Benchmark.Benchmark
 import Experiment_1_1.SequentialReading
+import java.io.File
 
-case class LengthByMappedMemoryBM(fileAddress: String, bufferSize: Int) extends Benchmark{
+case class LengthByMappedMemoryBM(file: File, bufferSize: Int) extends Benchmark{
 
   override var repeatIndex: Int = 0
-  def benchmark: Unit = {
 
-    // Run benchmark.
+  // Run benchmark.
+  def benchmark: Unit = {
     while (repeatIndex < REPEATS) {
       startTime = System.nanoTime
-      length = SequentialReading(fileAddress).LengthByMappedMemory(bufferSize)
+      length = SequentialReading(file).LengthByMappedMemory(bufferSize)
       endTime = System.nanoTime
 
-
       val duration = (endTime - startTime) / 100000
-      printIntermediateResult("Calculating length of File by \"LengthByReadBufferSize\" Function takes: " +
-        duration + "ms")
+
+      printIntermediateResult("Calculating length of File by \"LengthByReadBufferSize\" Function takes: " + duration + "ms")
+
       if (repeatIndex >= WARMUP) durations.add(duration)
       repeatIndex += 1
     }

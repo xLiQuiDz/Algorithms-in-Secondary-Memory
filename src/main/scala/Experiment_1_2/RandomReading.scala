@@ -5,8 +5,9 @@ import Streams.InputStream
 import java.io.File
 import scala.util.Random
 
-case class RandomReading(fileAddress: String) {
-  val file: File = new File(fileAddress)
+case class RandomReading(file: File) {
+
+
   val inputStream: InputStream = new InputStream(file)
 
   def randJumpByReadCharacter(j: Int): Long = {

@@ -4,18 +4,18 @@ import java.util
 
 abstract class Benchmark{
 
-  val durations = new util.ArrayList[Long]
-  var length: Long = 0
   var WARMUP = 2
   var REPEATS = 10
+  var length: Long = 0
   var repeatIndex: Int
+  val durations = new util.ArrayList[Long]
 
   var startTime: Long = 0
   var endTime: Long = 0
 
   var averageTime: Long = 0
 
-  def calculateAvgDuration(durations: util.ArrayList[Long]) = {
+  def calculateAvgDuration(durations: util.ArrayList[Long]): Long = {
     var temp: Long = 0
     for (i <- 0 until durations.size) {
       temp += durations.get(i)
