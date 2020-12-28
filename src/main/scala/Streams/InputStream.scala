@@ -1,7 +1,10 @@
 package Streams
 
-import java.io.{BufferedReader, File, FileInputStream, FileReader, RandomAccessFile}
-import java.nio.channels.FileChannel
+import java.io.{BufferedReader, ByteArrayOutputStream, File, FileInputStream, FileReader, RandomAccessFile}
+import java.nio.channels.{FileChannel}
+import java.nio.charset.StandardCharsets
+import java.nio.ByteBuffer
+
 
 class InputStream(file: File) {
 
@@ -15,7 +18,7 @@ class InputStream(file: File) {
   private var channelSize: Long = 0
   var endOfStream = false
 
-  // Open file.
+  // Open file for reading.
   def open: Unit = {
     try {
       fileReader = new FileReader(file) // Used in 1.1.1
@@ -32,9 +35,10 @@ class InputStream(file: File) {
     }
   }
 
-  // Close file.
+  // Close file for reading.
   def close: Unit = {
     try {
+      resetStringBuffer
       fileReader.close
       bufferedReader.close
       randomAccessFile.close
@@ -43,7 +47,6 @@ class InputStream(file: File) {
       endOfStream = false
       channelSize = 0
       currentPosition = 0
-      resetStringBuffer
     } catch {
       case _ => throw new Exception("Exception ...")
     }
@@ -63,7 +66,7 @@ class InputStream(file: File) {
         stringBuffer.append(data.asInstanceOf[Char]) // Convert ASCI to Char.
         data = fileReader.read()
       }
-      if (data == -1) {
+      if (data == -1 || data == -10) {
         endOfStream = true
       }
       stringBuffer
@@ -94,7 +97,7 @@ class InputStream(file: File) {
   def readCharacterWithBuffer: StringBuffer = {
     resetStringBuffer
     try {
-      var data = bufferedReader.read()
+      var data = bufferedReader.read() // Reads the ASCI of the next character.
       while (data != 10 && data != -1) { // 10 for detecting End of line or -1 for detecting end of file.
         stringBuffer.append(data.asInstanceOf[Char])
         data = bufferedReader.read()
@@ -112,36 +115,35 @@ class InputStream(file: File) {
   // Read one character and add to buffer.
   def readFromMappedMemory(bufferSize: Int): StringBuffer = {
     resetStringBuffer
-
     var size = bufferSize
     if(channelSize - currentPosition == 0)  {
       endOfStream = true
       return new StringBuffer()
     }
-
     if (bufferSize > (channelSize - currentPosition)) {
       size = (channelSize - currentPosition).asInstanceOf[Int]
     }
-
-    val mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, currentPosition, size)
-
+    var mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, currentPosition, size)
     var byteArray: Array[Byte] = new Array[Byte](size)
-
     var data = mappedByteBuffer.get()
-
     var i: Int = 0
-    while (data != -1 && data != 10 && i < size && mappedByteBuffer.remaining() >= 36) {
+    while (data != -1 && data != 10 && i < size && mappedByteBuffer.hasRemaining) {
+      mappedByteBuffer.flip()
       byteArray(i) = data
       data = mappedByteBuffer.get
       currentPosition += 1
       i +=1
     }
-    var text = new String(byteArray)
+    var text = byteArray.map(_.toChar).mkString
     stringBuffer.append(text)
     mappedByteBuffer.clear()
     currentPosition += 1
     stringBuffer
   }
+
+  // ***********************************************************************************
+  // Auxiliary Procedures
+  // ***********************************************************************************
 
   // Seek position in line.
   def seek(pos: Long): Unit = {
@@ -177,6 +179,5 @@ class InputStream(file: File) {
   // https://www.ibm.com/support/knowledgecenter/ssw_aix_72/generalprogramming/understanding_mem_mapping.html
   // https://howtodoinjava.com/java/nio/memory-mapped-files-mappedbytebuffer/
   // https://www.javacodegeeks.com/2013/05/power-of-java-memorymapped-file.html
-
 }
 

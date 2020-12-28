@@ -5,7 +5,6 @@ import java.nio.{CharBuffer}
 import java.nio.channels.FileChannel
 import java.nio.charset.Charset
 
-// 1.2 Writing.
 class OutputStream(file: File) {
 
   private var fileWriter: FileWriter = null // Main writer stream.
@@ -33,14 +32,31 @@ class OutputStream(file: File) {
     }
   }
 
+  // CLose file for writing.
+  def close: Unit = {
+    try {
+      fileWriter.close
+      bufferedWriter.close
+      randomAccessFile.close
+      fileOutputStream.close
+      fileChannel.close
+      channelSize = 0
+      currentPosition = 0
+    } catch {
+      case _ => throw new Exception("Stream has not been created ...")
+    }
+  }
+
+  // ***********************************************************************************
+  // Writeln Procedures
+  // ***********************************************************************************
+
   // Implementation 1.1.1
   // Write one character to file.
   def writeCharacter(line: String): Unit = {
     try {
-      var i = 0
-      while (i < line.length()) {
+      for (i <- 0 until line.length) {
         fileWriter.write(line.charAt(i))
-        i += 1
       }
       fileWriter.write(System.lineSeparator)
       fileWriter.flush
@@ -65,10 +81,8 @@ class OutputStream(file: File) {
   // Write B character of line into the stream.
   def writeCharacterIntoBuffer(line: String): Unit = {
     try {
-      var i = 0
-      while (i < line.length()) {
+      for (i <- 0 until line.length()) {
         bufferedWriter.write(line.charAt(i))
-        i += 1
       }
       bufferedWriter.flush()
       fileWriter.write(System.lineSeparator)
@@ -78,6 +92,7 @@ class OutputStream(file: File) {
   }
 
   // Implementation 1.1.4
+  // Read one chara.
   def writeInMappedMemory(bufferSize: Int, string: String): Unit = {
     try {
       var newString = string
@@ -111,12 +126,12 @@ class OutputStream(file: File) {
     }
   }
 
-  def close: Unit = {
-    try {
-      fileWriter.close
-      bufferedWriter.close
-    } catch {
-      case _ => throw new Exception("Stream has not been created ...")
-    }
-  }
+  // ************************************************************
+  // References
+  // ************************************************************
+
+  // https://www.mathworks.com/help/matlab/import_export/overview-of-memory-mapping.html#:~:text=Memory%2Dmapping%20is%20a%20mechanism,within%20an%20application's%20address%20space.&text=This%20makes%20file%20reads%20and,such%20as%20fread%20and%20fwrite%20.
+  // https://www.ibm.com/support/knowledgecenter/ssw_aix_72/generalprogramming/understanding_mem_mapping.html
+  // https://howtodoinjava.com/java/nio/memory-mapped-files-mappedbytebuffer/
+  // https://www.javacodegeeks.com/2013/05/power-of-java-memorymapped-file.html
 }
