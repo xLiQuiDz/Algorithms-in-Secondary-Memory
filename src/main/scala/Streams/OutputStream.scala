@@ -1,7 +1,7 @@
 package Streams
 
 import java.io.{BufferedWriter, File, FileOutputStream, FileWriter, RandomAccessFile}
-import java.nio.{CharBuffer}
+import java.nio.{CharBuffer, MappedByteBuffer}
 import java.nio.channels.FileChannel
 import java.nio.charset.Charset
 
@@ -11,6 +11,7 @@ class OutputStream(file: File) {
   private var bufferedWriter: BufferedWriter = null // Used for writing line.
   private var randomAccessFile: RandomAccessFile = null // Used for seeking a position in file.
   private var fileOutputStream: FileOutputStream = null
+  private var mappedByteBuffer: MappedByteBuffer = null
   private var fileChannel: FileChannel = null
   private var currentPosition: Int = 0
   private var channelSize: Long = 0
@@ -42,6 +43,8 @@ class OutputStream(file: File) {
       fileChannel.close
       channelSize = 0
       currentPosition = 0
+      if(mappedByteBuffer != null) mappedByteBuffer.force
+      fileChannel.truncate(file.length())
     } catch {
       case _ => throw new Exception("Stream has not been created ...")
     }
@@ -92,26 +95,35 @@ class OutputStream(file: File) {
   }
 
   // Implementation 1.1.4
-  // Read one characters to output file.
-  def writeInMappedMemory(bufferSize: Int, line: String): Unit = {
+  // Read the buffer to output file.
+  def writeInMappedMemory(bufferSize: Int, string: String): Unit = {
     try {
-      var newString = line
+      var size = 0
+      var newString = string
       var endIndex = 0
-      if (line.length > bufferSize) {
+      if (string.length > bufferSize) {
+        size = bufferSize
         endIndex = bufferSize + currentPosition
-        if ((bufferSize + currentPosition) > line.length) endIndex = line.length
-        newString = line.substring(currentPosition, endIndex)
+        if ((bufferSize + currentPosition) > string.length) endIndex = string.length
+        newString = string.substring(currentPosition, endIndex)
         currentPosition = currentPosition + bufferSize
       }
+      else if(string.length <= bufferSize){
+        size = string.length
+      }
 
-      val mappedByteBuffer = fileChannel.
-        map(FileChannel.MapMode.READ_WRITE, currentPosition, bufferSize) // Get direct byte buffer access using channel.map() operation.
+      mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, currentPosition, size)
+
       val charBuffer: CharBuffer = CharBuffer.wrap(newString)
-      fileChannel.write(Charset.forName("utf-8").encode(charBuffer))
+      while(charBuffer.hasRemaining){
+        fileChannel.write(Charset.forName("utf-8").encode(charBuffer))
+      }
       mappedByteBuffer.clear
 
-      if (currentPosition >= line.length || bufferSize > line.length)
+
+      if (currentPosition >= string.length || bufferSize > string.length) {
         allFileWritten = true
+      }
     } catch {
       case _ => throw new Exception("Stream has not been opened ...")
     }
