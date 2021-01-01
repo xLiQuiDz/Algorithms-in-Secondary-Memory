@@ -26,7 +26,7 @@ class InputStream(file: File) {
       randomAccessFile = new RandomAccessFile(file, "r") // Used in seek and 1.1.4
       fileInputStream = new FileInputStream(file) // Used in 1.1.4
       stringBuffer = new StringBuffer // Used for output the read line.
-      fileChannel = randomAccessFile.getChannel
+      fileChannel = randomAccessFile.getChannel // //Get file channel in read-only mode.
       channelSize = fileChannel.size
       currentPosition = 0
       endOfStream = false
@@ -116,6 +116,7 @@ class InputStream(file: File) {
   def readFromMappedMemory(bufferSize: Int): StringBuffer = {
     resetStringBuffer
     var size = bufferSize
+
     if(channelSize - currentPosition == 0)  {
       endOfStream = true
       return new StringBuffer()
@@ -123,11 +124,12 @@ class InputStream(file: File) {
     if (bufferSize > (channelSize - currentPosition)) {
       size = (channelSize - currentPosition).asInstanceOf[Int]
     }
-    var mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, currentPosition, size)
+    var mappedByteBuffer = fileChannel.
+      map(FileChannel.MapMode.READ_ONLY, currentPosition, size) // Get direct byte buffer access using channel.map() operation.
     var byteArray: Array[Byte] = new Array[Byte](size)
     var data = mappedByteBuffer.get()
-    var i: Int = 0
-    while (data != -1 && data != 10 && i < size && mappedByteBuffer.hasRemaining) {
+    var i = 0
+    while (i < size && data != -1 && data != 10 && mappedByteBuffer.hasRemaining) {
       mappedByteBuffer.flip()
       byteArray(i) = data
       data = mappedByteBuffer.get
@@ -175,7 +177,7 @@ class InputStream(file: File) {
   // References
   // ************************************************************
 
-  // https://www.mathworks.com/help/matlab/import_export/overview-of-memory-mapping.html#:~:text=Memory%2Dmapping%20is%20a%20mechanism,within%20an%20application's%20address%20space.&text=This%20makes%20file%20reads%20and,such%20as%20fread%20and%20fwrite%20.
+  // https://www.mathworks.com/help/matlab/import_export/overview-of-memory-mapping.html#:~:text=Memory%2Dmapping%20is%20a%20mechanism,within%20an%20application's%20address%20space.&text=This%20makes%20file%20reads%20and,such%20as%20fread%20and%20fwrite%20
   // https://www.ibm.com/support/knowledgecenter/ssw_aix_72/generalprogramming/understanding_mem_mapping.html
   // https://howtodoinjava.com/java/nio/memory-mapped-files-mappedbytebuffer/
   // https://www.javacodegeeks.com/2013/05/power-of-java-memorymapped-file.html

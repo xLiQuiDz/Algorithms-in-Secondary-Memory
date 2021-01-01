@@ -23,7 +23,7 @@ class OutputStream(file: File) {
       bufferedWriter = new BufferedWriter(fileWriter) // Used in 1.1.2 and 1.1.3
       randomAccessFile = new RandomAccessFile(file, "rw") // Used in seek and 1.1.4
       fileOutputStream = new FileOutputStream(file)  // Used in 1.1.4
-      fileChannel = randomAccessFile.getChannel
+      fileChannel = randomAccessFile.getChannel // Get file channel in read-write mode.
       channelSize = fileChannel.size
       currentPosition = 0
       allFileWritten = false
@@ -92,24 +92,25 @@ class OutputStream(file: File) {
   }
 
   // Implementation 1.1.4
-  // Read one chara.
-  def writeInMappedMemory(bufferSize: Int, string: String): Unit = {
+  // Read one characters to output file.
+  def writeInMappedMemory(bufferSize: Int, line: String): Unit = {
     try {
-      var newString = string
+      var newString = line
       var endIndex = 0
-      if (string.length > bufferSize) {
+      if (line.length > bufferSize) {
         endIndex = bufferSize + currentPosition
-        if ((bufferSize + currentPosition) > string.length) endIndex = string.length
-        newString = string.substring(currentPosition, endIndex)
+        if ((bufferSize + currentPosition) > line.length) endIndex = line.length
+        newString = line.substring(currentPosition, endIndex)
         currentPosition = currentPosition + bufferSize
       }
 
-      val mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, currentPosition, bufferSize)
+      val mappedByteBuffer = fileChannel.
+        map(FileChannel.MapMode.READ_WRITE, currentPosition, bufferSize) // Get direct byte buffer access using channel.map() operation.
       val charBuffer: CharBuffer = CharBuffer.wrap(newString)
       fileChannel.write(Charset.forName("utf-8").encode(charBuffer))
       mappedByteBuffer.clear
 
-      if (currentPosition >= string.length || bufferSize > string.length)
+      if (currentPosition >= line.length || bufferSize > line.length)
         allFileWritten = true
     } catch {
       case _ => throw new Exception("Stream has not been opened ...")

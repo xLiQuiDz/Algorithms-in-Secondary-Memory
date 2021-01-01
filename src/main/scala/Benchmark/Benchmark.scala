@@ -4,21 +4,21 @@ import java.util
 
 abstract class Benchmark{
 
-  var WARMUP = 2
-  var REPEATS = 10
+  var WARMUP = 2 // Warm-up round.
+  var REPEATS = 10 // Total rounds.
+
   var length: Long = 0
   var repeatIndex: Int
   val durations = new util.ArrayList[Long]
 
   var startTime: Long = 0
   var endTime: Long = 0
-
   var averageTime: Long = 0
 
   def calculateAvgDuration(durations: util.ArrayList[Long]): Long = {
     var temp: Long = 0
     for (i <- 0 until durations.size) {
-      temp += durations.get(i)
+      temp += durations.get(i) // Get duration at episode i.
     }
     temp / durations.size
   }
@@ -34,9 +34,9 @@ abstract class Benchmark{
   }
 
   def printIntermediateResult(message: String): Unit = {
-    if(WARMUP -1 >=  repeatIndex )  System.out.println("Round " + (repeatIndex + 1) + ": (WARM UP)")
+    if(WARMUP -1 >=  repeatIndex ) println("Round " + (repeatIndex + 1) + ": (WARM UP)")
     else System.out.println("Round " + (repeatIndex + 1) + ":")
-    System.out.println(message)
-    System.out.println("-------------------------------------------------------------------------------")
+    println(message)
+    println("-------------------------------------------------------------------------------")
   }
 }

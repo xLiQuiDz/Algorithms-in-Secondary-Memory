@@ -11,9 +11,9 @@ case class LengthByMappedMemoryBM(file: File, bufferSize: Int) extends Benchmark
   // Run benchmark.
   def benchmark: Unit = {
     while (repeatIndex < REPEATS) {
-      startTime = System.nanoTime
+      startTime = System.nanoTime // Start time.
       length = SequentialReading(file).LengthByMappedMemory(bufferSize)
-      endTime = System.nanoTime
+      endTime = System.nanoTime // Stop time.
 
       val duration = (endTime - startTime) / 100000
 

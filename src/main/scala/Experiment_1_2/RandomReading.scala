@@ -7,9 +7,9 @@ import scala.util.Random
 
 case class RandomReading(file: File) {
 
-
   val inputStream: InputStream = new InputStream(file)
 
+  // Calculate length by randJumpByReadCharacter.
   def randJumpByReadCharacter(j: Int): Long = {
     inputStream.open
     var count = 0
@@ -23,6 +23,7 @@ case class RandomReading(file: File) {
     count
   }
 
+  // Calculate length by randJumpByReadBuffer.
   def randJumpByReadBuffer(j: Int): Long = {
     inputStream.open
     var count = 0
@@ -36,6 +37,7 @@ case class RandomReading(file: File) {
     count
   }
 
+  // Calculate length by randJumpByReadBufferSize.
   def randJumpByReadBufferSize(j: Int, bufferSize: Int): Long = {
     inputStream.open
     var count = 0
@@ -50,6 +52,7 @@ case class RandomReading(file: File) {
     count
   }
 
+  // Calculate length by randJumpByMappedMemory.
   def randJumpByMappedMemory(j: Int, bufferSize: Int): Long = {
     inputStream.open
     var count = 0

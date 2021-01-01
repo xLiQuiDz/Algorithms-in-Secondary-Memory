@@ -12,9 +12,9 @@ case class LengthByReadBufferSizeBM(file: File, bufferSize: Int) extends Benchma
   // Run benchmark.
   def benchmark: Unit = {
     while (repeatIndex < REPEATS) {
-      startTime = System.nanoTime
+      startTime = System.nanoTime // Start time.
       length = SequentialReading(file).LengthByReadBufferSize(bufferSize)
-      endTime = System.nanoTime
+      endTime = System.nanoTime // Stop time.
 
       val duration = (endTime - startTime) / 100000
 

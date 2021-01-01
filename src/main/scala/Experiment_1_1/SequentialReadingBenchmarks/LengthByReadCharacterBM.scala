@@ -14,9 +14,9 @@ case class LengthByReadCharacterBM(file: File) extends Benchmark {
   // Run benchmark.
   def benchmark: Unit = {
     while (repeatIndex < REPEATS) {
-      startTime = System.nanoTime
+      startTime = System.nanoTime // Start time.
       length = SequentialReading(file).LengthByReadCharacter()
-      endTime = System.nanoTime
+      endTime = System.nanoTime // stop time.
 
       val duration = (endTime - startTime) / 100000
 
