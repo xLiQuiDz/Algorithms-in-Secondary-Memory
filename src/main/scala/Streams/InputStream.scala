@@ -115,29 +115,26 @@ class InputStream(file: File) {
   // Read one character and add to buffer.
   def readFromMappedMemory(bufferSize: Int): StringBuffer = {
     resetStringBuffer
-    var size = bufferSize
 
+    var size = bufferSize
     if(channelSize - currentPosition == 0)  {
       endOfStream = true
       return new StringBuffer()
     }
+
     if (bufferSize > (channelSize - currentPosition)) {
       size = (channelSize - currentPosition).asInstanceOf[Int]
     }
-    var mappedByteBuffer = fileChannel.
-      map(FileChannel.MapMode.READ_ONLY, currentPosition, size) // Get direct byte buffer access using channel.map() operation.
-    var byteArray: Array[Byte] = new Array[Byte](size)
+
+    val mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, currentPosition, size)
+
     var data = mappedByteBuffer.get()
-    var i = 0
-    while (i < size && data != -1 && data != 10 && mappedByteBuffer.hasRemaining) {
-      mappedByteBuffer.flip()
-      byteArray(i) = data
+
+    while (data != -1 && data != 10 && mappedByteBuffer.hasRemaining) {
+      stringBuffer.append(data.asInstanceOf[Char])
       data = mappedByteBuffer.get
       currentPosition += 1
-      i +=1
     }
-    var text = byteArray.map(_.toChar).mkString
-    stringBuffer.append(text)
     mappedByteBuffer.clear()
     currentPosition += 1
     stringBuffer
