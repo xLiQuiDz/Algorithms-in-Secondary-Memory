@@ -43,8 +43,10 @@ class OutputStream(file: File) {
       fileChannel.close
       channelSize = 0
       currentPosition = 0
-      if(mappedByteBuffer != null) mappedByteBuffer.force
-      fileChannel.truncate(file.length())
+      if(mappedByteBuffer != null) {
+        mappedByteBuffer.force
+        mappedByteBuffer.clear
+      }
     } catch {
       case _ => throw new Exception("Stream has not been created ...")
     }
