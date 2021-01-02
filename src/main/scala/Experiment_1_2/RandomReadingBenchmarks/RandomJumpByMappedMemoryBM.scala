@@ -15,7 +15,7 @@ case class RandJumpByMappedMemoryBM(file: File, j:Int,  bufferSize: Int) extends
       length = RandomReading(file).randJumpByMappedMemory(j, bufferSize)
       endTime = System.nanoTime
 
-      val duration = (endTime - startTime) / 100000
+      val duration = (endTime - startTime) / 1000000
 
       printIntermediateResult("Calculating length by \"randJumpByReadCharacter\" Function takes: " + duration + "ms")
 

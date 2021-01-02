@@ -15,7 +15,7 @@ case class LengthByMappedMemoryBM(file: File, bufferSize: Int) extends Benchmark
       length = SequentialReading(file).LengthByMappedMemory(bufferSize)
       endTime = System.nanoTime // Stop time.
 
-      val duration = (endTime - startTime) / 100000
+      val duration = (endTime - startTime) / 1000000
 
       printIntermediateResult("Calculating length of File by \"LengthByReadBufferSize\" Function takes: " + duration + "ms")
 

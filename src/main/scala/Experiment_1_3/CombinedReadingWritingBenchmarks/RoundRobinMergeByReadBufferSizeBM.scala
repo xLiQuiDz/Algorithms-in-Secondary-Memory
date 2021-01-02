@@ -16,7 +16,7 @@ case class RoundRobinMergeByReadBufferSizeBM(inputFiles: Array[File], outputFile
       CombinedReadingAndWriting(inputFiles, outputFile).rrmergereadCharacterWithBufferWriteCharacter
       endTime = System.nanoTime // Stop time.
 
-      val duration = (endTime - startTime) / 100000
+      val duration = (endTime - startTime) / 1000000
 
       printIntermediateResult("Calculating length of File by \"RoundRobinMergeByReadBufferSizeBM\" Function takes: " + duration + "ms")
 

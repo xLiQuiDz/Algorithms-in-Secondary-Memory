@@ -15,7 +15,7 @@ case class RandJumpByReadBufferSizeBM(file: File, j:Int, bufferSize: Int) extend
       length = RandomReading(file).randJumpByReadBufferSize(j, bufferSize)
       endTime = System.nanoTime
 
-      val duration = (endTime - startTime) / 100000
+      val duration = (endTime - startTime) / 1000000
 
       printIntermediateResult("Calculating length by \"randJumpByReadBuffer\" Function takes: " + duration + "ms")
 
