@@ -27,13 +27,19 @@ case class MultiwayMerge (f:File, k:Int, M:Int, d:Int) {
     var file_num = 0;
     var file_queue = new Queue[File]()
     var int_flag:Int = 0
+    var byte_count:Int = 0;
+
+    // ***************************************************************************************
+    // Dividing the total number of file data(N) in file f into [N/M] sorted Files.
+    // ***************************************************************************************
 
     //while file not ends
     while(!inputStream.endOfStream){
       count = count + 1
 
       //total number of file data divided into N/M sorted Files
-      if(count>M) {
+//      if(count>M) {
+      if(byte_count>M) { //when total number of bytes read is more than M
         //sorting based on k-th column
         if(isAllDigits(mergelist(0)(k-1))){
           templist = mergelist.sortBy(_(k-1).toInt) //if k-th column is Integer
@@ -49,6 +55,7 @@ case class MultiwayMerge (f:File, k:Int, M:Int, d:Int) {
         outputStream.close
         mergelist = new ListBuffer[Array[String]] //mergeList cleared up to add next M rows
         count = 1 //count reset to 1 to write next M rows
+        byte_count =0 //reset byte count
       }
 
       if(count == 1) {
@@ -57,13 +64,14 @@ case class MultiwayMerge (f:File, k:Int, M:Int, d:Int) {
         //n_by_m_sortedFiles
         outputFile = new File("src/main/resources/mergeSortFiles/n_by_m_sortedFiles/file_"+file_num.toString()+".txt")
         //newly created file added to queue
-        file_queue.enqueue(new File("src/main/resources/mergeSortFiles/n_by_m_sortedFiles/file_"+file_num.toString()+".txt"))
+        file_queue.enqueue(outputFile)
         outputStream = new OutputStream(outputFile)
         //new File created
         outputStream.create
       }
 
       strBuff = inputStream.readLine
+      byte_count = byte_count+strBuff.length() //updating byte count
       //each row converted into Array[String] and appended to mergeList
       var mergeSortArray: Array[String] = strBuff.toString.split(",")
       if(!inputStream.endOfStream){
@@ -87,7 +95,10 @@ case class MultiwayMerge (f:File, k:Int, M:Int, d:Int) {
     outputStream.close //closing the file
     mergelist = new ListBuffer[Array[String]] //clearing the mergeList
 
+    // ***************************************************************************************
     // Do the merging d number of files
+    // ***************************************************************************************
+
     //t:(Int,Array[String]) -> Int is a temporary value which is used while dequeueing
     // to recognize which file does this smallest row come from within the d files being merged
     // -> Array[String] is a row from the file
@@ -140,7 +151,7 @@ case class MultiwayMerge (f:File, k:Int, M:Int, d:Int) {
       file_num = file_num + 1
       //d_mergeFiles
       outputFile = new File("src/main/resources/mergeSortFiles/d_mergeFiles/file_"+file_num.toString()+".txt")
-      file_queue.enqueue(new File("src/main/resources/mergeSortFiles/d_mergeFiles/file_"+file_num.toString()+".txt"))
+      file_queue.enqueue(outputFile)
       temp_output_stream = new OutputStream(outputFile)
       temp_output_stream.create
 
@@ -187,3 +198,9 @@ case class MultiwayMerge (f:File, k:Int, M:Int, d:Int) {
   }
 
 }
+// ************************************************************
+// References
+// ************************************************************
+
+//https://stackoverflow.com/questions/9938098/how-to-check-to-see-if-a-string-is-a-decimal-number-in-scala#:~:text=forall%20takes%20a%20function%20(in,the%20collection%2C%20and%20false%20otherwise.
+//https://www.geeksforgeeks.org/queue-in-scala/
