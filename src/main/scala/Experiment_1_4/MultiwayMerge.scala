@@ -194,7 +194,7 @@ case class MultiwayMerge (f:File, k:Int, M:Int, d:Int) {
       }
       temp_output_stream.close
     }//while(file_queue.length>1) ends here
-
+    println("Sorted Output file is "+ file_queue(0).getPath)
   }
 
 }
