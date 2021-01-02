@@ -62,7 +62,7 @@ case class MultiwayMerge (f:File, k:Int, M:Int, d:Int) {
         file_num = file_num + 1
         //create file with M number of lines
         //n_by_m_sortedFiles
-        outputFile = new File("src/main/resources/mergeSortFiles/n_by_m_sortedFiles/file_"+file_num.toString()+".txt")
+        outputFile = new File("src/main/resources/file_"+file_num.toString()+".txt")
         //newly created file added to queue
         file_queue.enqueue(outputFile)
         outputStream = new OutputStream(outputFile)
@@ -150,7 +150,7 @@ case class MultiwayMerge (f:File, k:Int, M:Int, d:Int) {
       //create output file
       file_num = file_num + 1
       //d_mergeFiles
-      outputFile = new File("src/main/resources/mergeSortFiles/d_mergeFiles/file_"+file_num.toString()+".txt")
+      outputFile = new File("src/main/resources/file_"+file_num.toString()+".txt")
       file_queue.enqueue(outputFile)
       temp_output_stream = new OutputStream(outputFile)
       temp_output_stream.create
