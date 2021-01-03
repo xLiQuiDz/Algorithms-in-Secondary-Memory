@@ -6,7 +6,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) {
+case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File, bufferSize: Int = 128*32) {
 
   var stringBuffer: StringBuffer = new StringBuffer()
   val outputStream = new OutputStream(outputFile)
@@ -19,7 +19,7 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
     val inputStream = new InputStream(file)
     inputStream.open
     inputStreamsList :+ (inputStream, false)
-    inputStream.setBufferSize(1024)
+    inputStream.setBufferSize(bufferSize)
   })
 
   // ************************************************************
@@ -27,10 +27,10 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
   // ************************************************************
 
   def rrmergeReadCharacterWithBufferWriteCharacter: Unit = {
-    inputFiles.zipWithIndex.map {
+    inputFiles.zipWithIndex.foreach {
       case (file, index) => Future(readCharacterWithBufferWriteCharacter(file, index))
         .onComplete { case Success(res) => {
-          var allFilesRead = inputStreamsList.forall(tuple => tuple._2 == true)
+          val allFilesRead = inputStreamsList.forall(tuple => tuple._2)
           if (allFilesRead) outputStream.close
         }
         case Failure(e) => println("failure: " + e.getMessage)
@@ -42,7 +42,8 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
     val inputStream = new InputStream(file)
     inputStreamsList(index) = (inputStream, false)
     inputStream.open
-    inputStream.setBufferSize(1024)
+    inputStream.setBufferSize(bufferSize)
+    outputStream.setBufferSize(bufferSize)
     while (!inputStream.endOfStream) {
       stringBuffer = inputStream.readCharacterWithBuffer
       outputStream.writeCharacterIntoBuffer(stringBuffer.toString)
@@ -56,10 +57,10 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
   // ************************************************************
 
   def rrmergeReadCharacterWithBufferWriteLine: Unit = {
-    inputFiles.zipWithIndex.map {
+    inputFiles.zipWithIndex.foreach {
       case (file, index) => Future(readCharacterWithBufferWriteLine(file, index))
-        .onComplete { case Success(res) => {
-          var allFilesRead = inputStreamsList.forall(tuple => tuple._2 == true)
+        .onComplete { case Success(_) => {
+          val allFilesRead = inputStreamsList.forall(tuple => tuple._2)
           if (allFilesRead) outputStream.close
         }
         case Failure(e) => println("failure: " + e.getMessage)
@@ -71,7 +72,8 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
     val inputStream = new InputStream(file)
     inputStreamsList(index) = (inputStream, false)
     inputStream.open
-    inputStream.setBufferSize(1024)
+    inputStream.setBufferSize(bufferSize)
+    outputStream.setBufferSize(bufferSize)
     while (!inputStream.endOfStream) {
       stringBuffer = inputStream.readCharacterWithBuffer
       outputStream.writeLine(stringBuffer.toString)
@@ -85,10 +87,10 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
   // ************************************************************
 
   def rrmergeReadCharacterWithBufferWriteLineWithBuffer: Unit = {
-    inputFiles.zipWithIndex.map {
+    inputFiles.zipWithIndex.foreach {
       case (file, index) => Future(readCharacterWithBufferWriteLineWithBuffer(file, index))
         .onComplete { case Success(res) => {
-          var allFilesRead = inputStreamsList.forall(tuple => tuple._2 == true)
+          var allFilesRead = inputStreamsList.forall(tuple => tuple._2)
           if (allFilesRead) outputStream.close
         }
         case Failure(e) => println("failure: " + e.getMessage)
@@ -100,10 +102,10 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
     val inputStream = new InputStream(file)
     inputStreamsList(index) = (inputStream, false)
     inputStream.open
-    inputStream.setBufferSize(1024)
+    inputStream.setBufferSize(bufferSize)
+    outputStream.setBufferSize(bufferSize)
     while (!inputStream.endOfStream) {
       stringBuffer = inputStream.readCharacterWithBuffer
-      outputStream.setBufferSize(1024)
       outputStream.writeCharacterIntoBuffer(stringBuffer.toString)
     }
     inputStream.close
@@ -115,10 +117,10 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
   // ************************************************************
 
   def rrmergeReadCharacterWithBufferWriteWithMappedMemory: Unit = {
-    inputFiles.zipWithIndex.map {
+    inputFiles.zipWithIndex.foreach {
       case (file, index) => Future(ReadCharacterWithBufferWriteWithMappedMemory(file, index))
-        .onComplete { case Success(res) => {
-          var allFilesRead = inputStreamsList.forall(tuple => tuple._2 == true)
+        .onComplete { case Success(_) => {
+          val allFilesRead = inputStreamsList.forall(tuple => tuple._2 )
           if (allFilesRead) outputStream.close
         }
         case Failure(e) => println("failure: " + e.getMessage)
@@ -130,10 +132,10 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
     val inputStream = new InputStream(file)
     inputStreamsList(index) = (inputStream, false)
     inputStream.open
-    inputStream.setBufferSize(1024)
+    inputStream.setBufferSize(bufferSize)
     while (!inputStream.endOfStream) {
       stringBuffer = inputStream.readCharacterWithBuffer
-      outputStream.writeInMappedMemory(1024, stringBuffer.toString)
+      outputStream.writeInMappedMemory(bufferSize, stringBuffer.toString)
     }
     inputStream.close
     inputStreamsList(index) = (inputStream, true)
@@ -145,10 +147,10 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
   // ************************************************************
 
   def rrmergeReadCharacterWithMappedMemoryWriteCharacter: Unit = {
-    inputFiles.zipWithIndex.map {
+    inputFiles.zipWithIndex.foreach {
       case (file, index) => Future(ReadCharacterWithMappedMemoryWriteCharacter(file, index))
-        .onComplete { case Success(res) => {
-          var allFilesRead = inputStreamsList.forall(tuple => tuple._2 == true)
+        .onComplete { case Success(_) => {
+          var allFilesRead = inputStreamsList.forall(tuple => tuple._2)
           if (allFilesRead) outputStream.close
         }
         case Failure(e) => println("failure: " + e.getMessage)
@@ -161,8 +163,8 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
     inputStreamsList(index) = (inputStream, false)
     inputStream.open
     while (!inputStream.endOfStream) {
-      stringBuffer = inputStream.readFromMappedMemory(1024)
-      outputStream.writeCharacterIntoBuffer(stringBuffer.toString)
+      stringBuffer = inputStream.readFromMappedMemory(bufferSize)
+      outputStream.writeCharacter(stringBuffer.toString)
     }
     inputStream.close
     inputStreamsList(index) = (inputStream, true)
@@ -173,10 +175,10 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
   // ************************************************************
 
   def rrmergeReadCharacterWithMappedMemoryWriteLine: Unit = {
-    inputFiles.zipWithIndex.map {
+    inputFiles.zipWithIndex.foreach {
       case (file, index) => Future(ReadCharacterWithMappedMemoryWriteLine(file, index))
-        .onComplete { case Success(res) => {
-          var allFilesRead = inputStreamsList.forall(tuple => tuple._2 == true)
+        .onComplete { case Success(_) => {
+          val allFilesRead = inputStreamsList.forall(tuple => tuple._2)
           if (allFilesRead) outputStream.close
         }
         case Failure(e) => println("failure: " + e.getMessage)
@@ -189,7 +191,7 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
     inputStreamsList(index) = (inputStream, false)
     inputStream.open
     while (!inputStream.endOfStream) {
-      stringBuffer = inputStream.readFromMappedMemory(1024)
+      stringBuffer = inputStream.readFromMappedMemory(bufferSize)
       outputStream.writeLine(stringBuffer.toString)
     }
     inputStream.close
@@ -201,10 +203,10 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
   // ************************************************************
 
   def rrmergeReadCharacterWithMappedMemoryWriteLineWithBuffer: Unit = {
-    inputFiles.zipWithIndex.map {
+    inputFiles.zipWithIndex.foreach {
       case (file, index) => Future(ReadCharacterWithMappedMemoryWriteLineWithBuffer(file, index))
-        .onComplete { case Success(res) => {
-          var allFilesRead = inputStreamsList.forall(tuple => tuple._2 == true)
+        .onComplete { case Success(_) => {
+          val allFilesRead = inputStreamsList.forall(tuple => tuple._2)
           if (allFilesRead) outputStream.close
         }
         case Failure(e) => println("failure: " + e.getMessage)
@@ -216,9 +218,9 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
     val inputStream = new InputStream(file)
     inputStreamsList(index) = (inputStream, false)
     inputStream.open
+    outputStream.setBufferSize(bufferSize)
     while (!inputStream.endOfStream) {
-      stringBuffer = inputStream.readFromMappedMemory(1024)
-      outputStream.setBufferSize(1024)
+      stringBuffer = inputStream.readFromMappedMemory(bufferSize)
       outputStream.writeCharacterIntoBuffer(stringBuffer.toString)
     }
     inputStream.close
@@ -230,10 +232,10 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
   // ************************************************************
 
   def rrmergeReadCharacterWithMappedMemoryWriteWithMappedMemory: Unit = {
-    inputFiles.zipWithIndex.map {
+    inputFiles.zipWithIndex.foreach {
       case (file, index) => Future(ReadCharacterWithMappedMemoryWriteWithMappedMemory(file, index))
-        .onComplete { case Success(res) => {
-          var allFilesRead = inputStreamsList.forall(tuple => tuple._2 == true)
+        .onComplete { case Success(_) => {
+          val allFilesRead = inputStreamsList.forall(tuple => tuple._2)
           if (allFilesRead) outputStream.close
         }
         case Failure(e) => println("failure: " + e.getMessage)
@@ -246,8 +248,8 @@ case class CombinedReadingAndWriting(inputFiles: Array[File], outputFile: File) 
     inputStreamsList(index) = (inputStream, false)
     inputStream.open
     while (!inputStream.endOfStream) {
-      stringBuffer = inputStream.readFromMappedMemory(1024)
-      outputStream.writeInMappedMemory(1024, stringBuffer.toString)
+      stringBuffer = inputStream.readFromMappedMemory(bufferSize)
+      outputStream.writeInMappedMemory(bufferSize, stringBuffer.toString)
     }
     inputStream.close
     inputStreamsList(index) = (inputStream, true)
