@@ -1,10 +1,7 @@
 package Experiment_1_3
 
-import Experiment_1_1.Benchmarks.file
-import Experiment_1_1.SequentialReadingBenchmarks.LengthByMappedMemoryBM
-import Experiment_1_2.Benchmarks.bm2
 import Experiment_1_3.CombinedReadingWritingBenchmarks.RoundRobinMergeByReadBufferSizeBM
-
+import Experiment_1_3.CombinedReadingWritingBenchmarks.RoundRobinMergeByMappedMemoryBM
 import java.io.File
 
 object Benchmarks extends App {
@@ -20,12 +17,8 @@ object Benchmarks extends App {
   var bm1 = RoundRobinMergeByReadBufferSizeBM(inputFiles, outputFile)
   bm1.benchmark
 
-
-
-
-
-
-
-
+  println("----------------------Benchmarking RoundRobinMergeByMappedMemoryBM---------------------------")
+  var bm2 = RoundRobinMergeByMappedMemoryBM(inputFiles, outputFile)
+  bm2.benchmark
 
 }
