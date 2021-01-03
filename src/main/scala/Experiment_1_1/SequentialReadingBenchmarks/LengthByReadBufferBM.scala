@@ -17,7 +17,7 @@ case class LengthByReadBufferBM(file: File) extends Benchmark{
 
       val duration = (endTime - startTime) / 1000000
 
-      printIntermediateResult("Calculating length of File by \"LengthByReadBufferSize\" Function takes: " + duration + "ms")
+      printIntermediateResult("Calculating length of File by \"LengthByReadBuffer\" Function takes: " + duration + "ms")
 
       if (repeatIndex >= WARMUP) durations.add(duration)
       repeatIndex += 1

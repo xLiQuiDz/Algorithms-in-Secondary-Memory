@@ -17,7 +17,7 @@ case class LengthByMappedMemoryBM(file: File, bufferSize: Int) extends Benchmark
 
       val duration = (endTime - startTime) / 1000000
 
-      printIntermediateResult("Calculating length of File by \"LengthByReadBufferSize\" Function takes: " + duration + "ms")
+      printIntermediateResult("Calculating length of File by \"LengthByMappedMemory\" Function takes: " + duration + "ms")
 
       if (repeatIndex >= WARMUP) durations.add(duration)
       repeatIndex += 1
