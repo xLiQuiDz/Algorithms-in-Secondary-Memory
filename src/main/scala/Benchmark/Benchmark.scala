@@ -29,7 +29,7 @@ abstract class Benchmark{
     System.out.println("Length of " + parameterName + ": " + length)
     System.out.println("Total runs: " + reps)
     System.out.println("Warm-up runs: " + warmUp)
-    System.out.println("Average \"ReadCharacter\" Duration: " + avg + "ms")
+    System.out.println("Average \"RUN TIME\" Duration: " + avg + "ms")
     System.out.println("-------------------------------------------------------------------------------")
   }
 
