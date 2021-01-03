@@ -13,7 +13,7 @@ case class RoundRobinMergeByReadBufferSizeBM(inputFiles: Array[File], outputFile
   def benchmark: Unit = {
     while (repeatIndex < REPEATS) {
       startTime = System.nanoTime // Start time.
-      CombinedReadingAndWriting(inputFiles, outputFile).rrmergereadCharacterWithBufferWriteCharacter
+      // CombinedReadingAndWriting(inputFiles, outputFile).rrmergereadCharacterWithBufferWriteCharacter
       endTime = System.nanoTime // Stop time.
 
       val duration = (endTime - startTime) / 1000000
